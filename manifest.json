@@ -1,0 +1,9 @@
+{
+  "name": "ClipMaker IA Mobile",
+  "short_name": "ClipMaker",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#10152a",
+  "icons": []
+}

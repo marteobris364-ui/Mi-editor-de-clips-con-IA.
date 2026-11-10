@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10152a"><title>ClipMaker IA Mobile</title>
+<link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css">
+</head><body>
+<header><div class="brand">✂️ <span>ClipMaker <b>IA</b></span></div><span class="version">MVP 1.0</span></header>
+<main>
+<section class="hero"><div class="eyebrow">CREADOR DE CLIPS</div><h1>Tu video.<br><em>Muchos clips.</em></h1><p>Organiza, revisa, subtitula y exporta clips desde el navegador.</p></section>
+<section class="panel">
+<h2>1 · Añade tu video</h2>
+<label class="filebox">📁 Elegir video del teléfono<input id="videoFile" type="file" accept="video/*"></label>
+<div class="field"><label for="videoUrl">O pega un enlace directo al archivo de video</label><input id="videoUrl" type="url" placeholder="https://sitio.com/video.mp4"><button id="loadUrl" class="secondary">Cargar enlace</button><p class="hint">Los enlaces de YouTube/TikTok normalmente no son archivos directos y no se pueden importar aquí por restricciones de plataforma.</p></div>
+<video id="sourceVideo" controls playsinline hidden></video><div id="videoInfo" class="notice">Ningún video cargado.</div>
+</section>
+<section class="panel">
+<h2>2 · Configura tus clips</h2><div class="two">
+<div><label for="clipLength">Duración por clip</label><select id="clipLength"><option value="15">15 segundos</option><option value="30" selected>30 segundos</option><option value="45">45 segundos</option><option value="60">60 segundos</option></select></div>
+<div><label for="clipCount">Cantidad</label><select id="clipCount"><option>3</option><option selected>5</option><option>10</option><option>15</option><option>20</option></select></div></div>
+<label for="cutMode">Cómo elegir los tiempos</label><select id="cutMode"><option value="even">Repartir en todo el video</option><option value="start">Desde el inicio</option><option value="manual">Un solo corte manual</option></select>
+<div id="manualBox" hidden class="two"><div><label>Inicio (segundos)</label><input id="manualStart" type="number" min="0" value="0"></div><div><label>Fin (segundos)</label><input id="manualEnd" type="number" min="1" value="30"></div></div>
+<button id="makeCuts">Crear lista de clips</button><div id="cutStatus" class="notice">Carga un video primero.</div>
+</section>
+<section class="panel"><h2>3 · Revisa y edita</h2><div id="clipList"><p class="hint">Tus clips aparecerán aquí.</p></div><div class="actions"><button id="exportAll">Exportar todos</button><button id="copyList" class="secondary">Copiar lista</button></div><div id="exportStatus" class="notice">Exportación pendiente.</div></section>
+<section class="panel"><h2>4 · Subtítulos</h2><p class="hint">Pega texto o una transcripción y crea un SRT con tiempos aproximados. Para sincronía exacta necesitas una transcripción con marcas de tiempo.</p><textarea id="transcript" rows="5" placeholder="Pega aquí el diálogo o texto…"></textarea><div class="two"><div><label>Palabras por bloque</label><select id="wordsPerBlock"><option>5</option><option selected>8</option><option>10</option></select></div><div><label>Segundos por bloque</label><input id="subtitleSecs" type="number" value="3" min="1" max="8"></div></div><button id="makeSrt" class="secondary">Generar y descargar SRT</button><div id="srtStatus" class="notice">No se ha creado SRT.</div></section>
+<section class="panel"><h2>5 · Herramientas rápidas</h2><div class="two"><button id="downloadTitles" class="secondary">Descargar títulos TXT</button><button id="clearProject" class="danger">Limpiar proyecto</button></div><p class="hint">Los títulos son sugerencias editables; revisa el contenido antes de publicar.</p></section>
+<section class="panel disclosure"><h2>Qué es y qué no es esta versión</h2><p><b>Incluye:</b> cortes por tiempo, lista editable, exportación MP4 vía FFmpeg WebAssembly, texto de títulos y archivo SRT estimado.</p><p><b>Aún no incluye IA semántica real:</b> no comprende el diálogo, no garantiza viralidad, no elimina silencios automáticamente ni descarga contenido de plataformas protegidas. La exportación puede fallar con archivos grandes en iPhone.</p><p>Para una experiencia estable, publicar esta carpeta en un hosting HTTPS como GitHub Pages. El archivo local puede tener restricciones de Safari.</p></section>
+<footer>ClipMaker IA Mobile · MVP 1.0 · Proyecto de demostración</footer>
+</main><script type="module" src="app.js"></script></body></html>
