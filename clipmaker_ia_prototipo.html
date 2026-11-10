@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClipMaker IA — Prototipo</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#141b2e;--panel2:#1b2540;--text:#f4f6ff;--muted:#aab5d1;--accent:#8b7cff;--line:#2b3654}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#0b1020,#121b35);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:1050px;margin:auto;padding:22px 16px 60px}.hero{padding:24px 0 18px}.eyebrow{color:#b8b0ff;font-weight:700;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase}
+h1{font-size:clamp(2rem,6vw,3.2rem);line-height:1.05;margin:8px 0 12px}.sub{color:var(--muted);max-width:680px}
+.grid{display:grid;grid-template-columns:1fr;gap:16px}@media(min-width:800px){.grid{grid-template-columns:1.05fr .95fr}}
+.card{background:rgba(20,27,46,.95);border:1px solid var(--line);border-radius:18px;padding:18px;min-width:0}
+h2{font-size:1.15rem;margin:0 0 14px}label{display:block;font-weight:650;margin:12px 0 6px}
+input,select,button{font:inherit}input[type=file],input[type=number],input[type=text],select{width:100%;background:#0c1326;border:1px solid #3a4769;color:var(--text);border-radius:10px;padding:11px}
+button{border:0;border-radius:11px;background:var(--accent);color:#fff;padding:11px 14px;font-weight:750;cursor:pointer}
+button.secondary{background:#263452;border:1px solid #3a4769}button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}
+video{width:100%;max-height:430px;background:#05070d;border-radius:12px;margin-top:12px}
+.note{font-size:.88rem;color:var(--muted)}.status{padding:10px 12px;background:#0c1326;border-radius:10px;color:#d8ddf5;margin-top:12px;white-space:pre-wrap}
+.clip{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;border-top:1px solid var(--line);padding:12px 0}
+.clip label{font-size:.83rem;margin-top:0}.clip input{padding:9px}
+.cliplist{margin-top:8px}.tag{display:inline-block;border:1px solid #4a5680;border-radius:99px;padding:3px 8px;color:#d6d1ff;font-size:.78rem}
+a{color:#c8c1ff}.foot{color:var(--muted);font-size:.84rem;margin-top:18px}
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div class="eyebrow">Tu herramienta de edición</div>
+    <h1>ClipMaker <span style="color:#a69bff">IA</span></h1>
+    <p class="sub">Prototipo inicial gratuito para preparar varios clips de un video. Importa un archivo, selecciona los momentos, revisa el resultado y exporta cada segmento en MP4 cuando el motor de edición sea compatible con tu navegador.</p>
+    <span class="tag">Versión 0.1 · Procesamiento local en el navegador</span>
+  </header>
+  <div class="grid">
+    <section class="card">
+      <h2>1. Importa tu video</h2>
+      <label for="file">Archivo de video</label>
+      <input id="file" type="file" accept="video/*">
+      <p class="note">El archivo permanece en tu dispositivo en esta versión. Los enlaces de YouTube no se descargan directamente desde la página; usa un archivo que tengas derecho a editar.</p>
+      <video id="preview" controls playsinline></video>
+      <div class="row">
+        <button id="useTime" class="secondary" disabled>Usar tiempo actual como inicio</button>
+        <button id="endTime" class="secondary" disabled>Usar tiempo actual como final</button>
+      </div>
+      <div id="videoInfo" class="note" style="margin-top:10px">Todavía no has seleccionado un video.</div>
+    </section>
+    <section class="card">
+      <h2>2. Prepara los clips</h2>
+      <div class="row">
+        <div><label for="duration">Duración objetivo (segundos)</label><input id="duration" type="number" min="5" max="180" value="30"></div>
+        <div><label for="ratio">Formato</label><select id="ratio"><option value="9:16">Vertical 9:16</option><option value="original">Conservar formato original</option></select></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button id="suggest" disabled>Proponer varios segmentos</button>
+        <button id="add" class="secondary" disabled>Añadir clip manual</button>
+      </div>
+      <p class="note">La propuesta inicial divide el video en segmentos consecutivos. Todavía no es detección semántica de momentos virales; esa función se añadirá en una siguiente fase con transcripción y análisis de texto.</p>
+      <div id="clips" class="cliplist"></div>
+      <div class="row" style="margin-top:14px">
+        <button id="export" disabled>Exportar clips MP4</button>
+        <button id="clear" class="secondary">Borrar lista</button>
+      </div>
+      <div id="status" class="status" role="status">Listo. Selecciona un archivo de video para comenzar.</div>
+      <div id="downloads"></div>
+    </section>
+  </div>
+  <section class="card" style="margin-top:16px">
+    <h2>Lo que falta para la versión automática</h2>
+    <ul>
+      <li>Transcripción de voz y subtítulos sincronizados.</li>
+      <li>Detección de frases y momentos con potencial de retención.</li>
+      <li>Reencuadre vertical inteligente para mantener a la persona dentro del encuadre.</li>
+      <li>Exportación robusta en distintos navegadores y teléfonos.</li>
+    </ul>
+    <p class="note">Este prototipo necesita conexión para cargar el motor FFmpeg desde una CDN la primera vez. El rendimiento depende del navegador, memoria disponible y tamaño del video; en iPhone, prueba primero con un video corto.</p>
+  </section>
+  <p class="foot">Aviso: utiliza videos propios o contenido para el que tengas autorización. Esta herramienta no concede derechos de reutilización sobre material de terceros.</p>
+</main>
+<script type="module">
+const $ = id => document.getElementById(id);
+const fileInput=$('file'), video=$('preview'), status=$('status'), clipsEl=$('clips');
+let sourceFile=null, objectUrl=null, clips=[], nextId=1, ffmpeg=null, ffmpegLoading=null;
+function say(msg){status.textContent=msg}
+function fmt(n){return Number(n).toFixed(2)}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderClips(){
+ clipsEl.innerHTML='';
+ if(!clips.length){clipsEl.innerHTML='<p class="note">Todavía no hay clips. Puedes proponer segmentos o añadir uno manualmente.</p>';return}
+ clips.forEach(c=>{
+  const d=document.createElement('div');d.className='clip';
+  d.innerHTML=`<div><label>Inicio (s)</label><input type="number" min="0" step="0.1" value="${c.start}" data-id="${c.id}" data-field="start"></div><div><label>Final (s)</label><input type="number" min="0" step="0.1" value="${c.end}" data-id="${c.id}" data-field="end"></div><button class="secondary" data-delete="${c.id}" aria-label="Eliminar clip">Quitar</button>`;
+  clipsEl.appendChild(d);
+ });
+}
+function addClip(start=0,end=Math.min(30,video.duration||30)){clips.push({id:nextId++,start:Number(start.toFixed(2)),end:Number(end.toFixed(2))});renderClips()}
+fileInput.addEventListener('change',()=>{
+ const f=fileInput.files?.[0];if(!f)return;
+ if(objectUrl)URL.revokeObjectURL(objectUrl);
+ sourceFile=f;objectUrl=URL.createObjectURL(f);video.src=objectUrl;clips=[];renderClips();
+ $('videoInfo').textContent=`${f.name} · ${(f.size/1024/1024).toFixed(1)} MB`;
+ say('Video cargado. Espera a que el navegador lea su duración.');
+ video.onloadedmetadata=()=>{const dur=video.duration;$('videoInfo').textContent=`${f.name} · ${(f.size/1024/1024).toFixed(1)} MB · ${fmt(dur)} segundos`;['suggest','add','useTime','endTime','export'].forEach(id=>$(id).disabled=false);say('Video listo. Puedes proponer segmentos o crear los tuyos.');};
+ video.onerror=()=>say('No se pudo abrir este formato en el navegador. Prueba con MP4 H.264.');
+});
+$('suggest').addEventListener('click',()=>{
+ if(!video.duration||!Number.isFinite(video.duration))return;
+ const target=Math.max(5,Math.min(180,Number($('duration').value)||30));
+ clips=[];let start=0;while(start<video.duration-0.25){let end=Math.min(video.duration,start+target);clips.push({id:nextId++,start:Number(start.toFixed(2)),end:Number(end.toFixed(2))});start=end}
+ renderClips();say(`Se propusieron ${clips.length} segmentos consecutivos. Revísalos antes de exportar; no son una predicción de viralidad.`);
+});
+$('add').addEventListener('click',()=>{if(!video.duration)return;addClip(Math.max(0,video.currentTime),Math.min(video.duration,video.currentTime+Math.max(5,Number($('duration').value)||30)));say('Clip añadido. Ajusta inicio y final si lo necesitas.')});
+$('useTime').addEventListener('click',()=>{if(!clips.length)addClip(video.currentTime,Math.min(video.duration,video.currentTime+30));else{clips[clips.length-1].start=Number(video.currentTime.toFixed(2));renderClips()}});
+$('endTime').addEventListener('click',()=>{if(!clips.length)addClip(Math.max(0,video.currentTime-30),video.currentTime);else{clips[clips.length-1].end=Number(video.currentTime.toFixed(2));renderClips()}});
+clipsEl.addEventListener('change',e=>{const input=e.target;if(!input.dataset.field)return;const c=clips.find(x=>x.id===Number(input.dataset.id));if(c){c[input.dataset.field]=Number(input.value);}});
+clipsEl.addEventListener('click',e=>{const id=Number(e.target.dataset.delete);if(id){clips=clips.filter(c=>c.id!==id);renderClips()}});
+$('clear').addEventListener('click',()=>{clips=[];renderClips();$('downloads').innerHTML='';say('Lista de clips borrada.')});
+async function loadFFmpeg(){
+ if(ffmpeg)return ffmpeg;if(ffmpegLoading)return ffmpegLoading;
+ ffmpegLoading=(async()=>{
+  say('Cargando motor de exportación FFmpeg. La primera carga puede tardar.');
+  const {FFmpeg}=await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js');
+  const {toBlobURL}=await import('https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js');
+  const instance=new FFmpeg();
+  instance.on('log',({message})=>{if(message)status.textContent='Procesando… '+message.slice(-160)});
+  const base='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
+  await instance.load({coreURL:await toBlobURL(base+'/ffmpeg-core.js','text/javascript'),wasmURL:await toBlobURL(base+'/ffmpeg-core.wasm','application/wasm')});
+  ffmpeg=instance;return instance;
+ })();
+ try{return await ffmpegLoading}catch(e){ffmpegLoading=null;throw e}
+}
+$('export').addEventListener('click',async()=>{
+ if(!sourceFile||!clips.length)return;
+ const valid=clips.filter(c=>Number.isFinite(c.start)&&Number.isFinite(c.end)&&c.start>=0&&c.end>c.start&&c.end<=video.duration+0.1);
+ if(!valid.length){say('Revisa los tiempos: el final debe ser mayor que el inicio y estar dentro del video.');return}
+ $('export').disabled=true;$('downloads').innerHTML='';
+ try{
+  const engine=await loadFFmpeg();
+  const inputName='input_'+sourceFile.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+  await engine.writeFile(inputName,new Uint8Array(await sourceFile.arrayBuffer()));
+  for(let i=0;i<valid.length;i++){
+   const c=valid[i],out=`clip_${String(i+1).padStart(2,'0')}.mp4`,duration=Math.max(.1,c.end-c.start);
+   say(`Exportando clip ${i+1} de ${valid.length}…`);
+   let args=['-ss',String(c.start),'-i',inputName,'-t',String(duration)];
+   if($('ratio').value==='9:16')args.push('-vf',"scale=720:1280:force_original_aspect_ratio=increase,crop=720:1280");
+   args.push('-c:v','libx264','-preset','ultrafast','-crf','25','-c:a','aac','-b:a','128k','-movflags','+faststart',out);
+   await engine.exec(args);
+   const data=await engine.readFile(out);const blob=new Blob([data.buffer],{type:'video/mp4'});const url=URL.createObjectURL(blob);
+   const link=document.createElement('a');link.href=url;link.download=out;link.textContent=`Descargar clip ${i+1} (${fmt(c.start)}–${fmt(c.end)} s)`;link.style.display='block';link.style.margin='10px 0';$('downloads').appendChild(link);
+  }
+  say(`Listo: ${valid.length} clip(s) exportados. Usa los enlaces para guardarlos.`);
+ }catch(e){console.error(e);say('No se pudo exportar en este navegador. Prueba con un video MP4 corto y un navegador actualizado. Detalle: '+(e?.message||e))}
+ finally{$('export').disabled=false}
+});
+renderClips();
+</script>
+</body>
+</html>
